@@ -37,7 +37,7 @@ paths:
       parameters: []
   /stats:
     get:
-      summary: Get Player List and Info
+      summary: Query player list and info
       tags:
         - Gameinformation
       responses:
@@ -85,7 +85,7 @@ paths:
         - game-key: []
   '/events/{round}':
     get:
-      summary: List battles
+      summary: Query events
       tags:
         - Gameinformation
       responses:
@@ -168,6 +168,32 @@ paths:
                 - End
                 - Amount
         description: ''
+  /sent:
+    get:
+      summary: Query sent ships
+      tags:
+        - Gameinformation
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of sent ships
+                items:
+                  $ref: '#/components/schemas/Sent'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: get-sent
+      description: Receives a list of your sent ships
+      security:
+        - account-key: []
+        - game-key: []
 components:
   schemas:
     Ships:
@@ -352,6 +378,30 @@ components:
           type: integer
         round:
           type: integer
+    Sent:
+      title: Sent
+      type: object
+      properties:
+        id:
+          type: string
+        start:
+          $ref: '#/components/schemas/Location'
+        end:
+          $ref: '#/components/schemas/Location'
+        sentAt:
+          type: integer
+          description: Round ships were sent at
+        ariveAt:
+          type: integer
+          description: Round the ships will arrive at
+        Amount:
+          type: integer
+      required:
+        - id
+        - start
+        - end
+        - sentAt
+        - ariveAt
   securitySchemes:
     account-key:
       type: apiKey

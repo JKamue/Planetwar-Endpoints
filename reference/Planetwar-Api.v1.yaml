@@ -2,8 +2,14 @@ openapi: 3.0.0
 info:
   title: Planetwar Api
   version: '1.0'
+  contact:
+    name: Jannes Kaspar-Müller
+    url: 'https://jkamue.de'
+    email: mail@jkamue.de
 servers:
-  - url: 'http://localhost:3000'
+  - url: 'http://planetwar.jkamue.de/api'
+  - url: 'http://localhost:8080/api'
+    description: ''
 paths:
   /map:
     get:
@@ -18,6 +24,22 @@ paths:
       operationId: get-map
       tags:
         - Gameinformation
+      description: Receive a detalied list of everything on the map
+  /players:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Owner'
+      operationId: get-players
+      description: Receives a List of all players
 components:
   schemas:
     Ships:
@@ -95,7 +117,7 @@ components:
         - production
         - skin
     Owner:
-      title: Owner
+      title: Player
       type: object
       properties:
         id:
@@ -110,7 +132,19 @@ components:
         - name
     Map:
       title: Map
-      type: array
+      type: object
       description: A collection of tiles that make up the map
-      items:
-        $ref: '#/components/schemas/Tile'
+      x-examples: {}
+      properties:
+        tiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tile'
+        size:
+          type: integer
+          minimum: 0
+          description: Height and width of the square map
+      required:
+        - tiles
+        - size
+  securitySchemes: {}

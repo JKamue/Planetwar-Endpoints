@@ -1,0 +1,60 @@
+openapi: 3.0.0
+info:
+  title: Planetwar Api
+  version: '1.0'
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /map:
+    get:
+      summary: Query whole map
+      responses: {}
+      operationId: get-map
+      tags:
+        - Gameinformation
+components:
+  schemas:
+    Ships:
+      title: Ships
+      type: object
+      properties:
+        location:
+          $ref: '#/components/schemas/Location'
+        amount:
+          type: string
+        owner:
+          type: string
+    Location:
+      title: Location
+      type: object
+      properties:
+        X:
+          type: integer
+        'Y':
+          type: integer
+    Tile:
+      title: Tile
+      type: object
+      properties:
+        location:
+          $ref: '#/components/schemas/Location'
+        ships:
+          $ref: '#/components/schemas/Ships'
+        hasShips:
+          type: boolean
+        planet:
+          $ref: '#/components/schemas/Planet'
+        hasPlanet:
+          type: string
+    Planet:
+      title: Planet
+      type: object
+      properties:
+        location:
+          $ref: '#/components/schemas/Location'
+        owner:
+          type: string
+        production:
+          type: integer
+        skin:
+          type: integer

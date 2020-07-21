@@ -30,40 +30,16 @@ paths:
       operationId: get-map
       tags:
         - Gameinformation
-      description: Receive a detalied list of everything on the map
+      description: Receive a detailed list of everything on the map
       security:
         - account-key: []
         - game-key: []
       parameters: []
-  /players:
-    get:
-      summary: Your GET endpoint
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Owner'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              examples: {}
-      operationId: get-players
-      description: Receives a List of all players
-      security:
-        - account-key: []
-        - game-key: []
   /stats:
     get:
-      summary: Your GET endpoint
-      tags: []
+      summary: Get Player List and Info
+      tags:
+        - Gameinformation
       responses:
         '200':
           description: OK
@@ -84,6 +60,47 @@ paths:
         - account-key: []
         - game-key: []
       description: Receive stats of each player in the round
+  /round:
+    get:
+      summary: Query round information
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Round'
+      operationId: get-round
+      description: Returns important data of current round
+      security:
+        - account-key: []
+        - game-key: []
+  '/events/{round}':
+    get:
+      summary: List battles
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+      operationId: get-events
+      description: Receives a List with all battles
+      security:
+        - account-key: []
+        - game-key: []
+    parameters:
+      - schema:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: true
+        name: round
+        in: path
+        required: true
+        description: specify the round for which events are shown
 components:
   schemas:
     Ships:
@@ -220,17 +237,62 @@ components:
           minimum: 0
         you:
           type: boolean
+        alive:
+          type: boolean
       required:
         - player
         - visibleShips
         - planets
         - you
+        - alive
+    Round:
+      title: Round
+      type: object
+      properties:
+        number:
+          type: integer
+        start:
+          type: string
+          description: 'Vermutlich unix epoch oder YYYY-MM-DD H:i:s'
+        length:
+          type: integer
+      required:
+        - number
+        - start
+        - length
+    Event:
+      title: Event
+      type: object
+      description: Information about a battle
+      properties:
+        id:
+          type: string
+        attacker:
+          $ref: '#/components/schemas/Owner'
+        defender:
+          $ref: '#/components/schemas/Owner'
+        attackerWon:
+          type: boolean
+        location:
+          $ref: '#/components/schemas/Location'
+        attackerShips:
+          type: integer
+        defenderShips:
+          type: integer
+        attackerShipslost:
+          type: integer
+        defenderShipslost:
+          type: integer
+        round:
+          type: integer
   securitySchemes:
     account-key:
       type: apiKey
       in: header
       description: This is one of your accounts keys
+      name: Account-Key
     game-key:
       type: apiKey
       in: header
       description: This your access key to the your current game
+      name: Game-Key

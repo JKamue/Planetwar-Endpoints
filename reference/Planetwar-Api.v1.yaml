@@ -21,10 +21,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Map'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
       operationId: get-map
       tags:
         - Gameinformation
       description: Receive a detalied list of everything on the map
+      security:
+        - account-key: []
+        - game-key: []
+      parameters: []
   /players:
     get:
       summary: Your GET endpoint
@@ -38,8 +48,42 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Owner'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples: {}
       operationId: get-players
       description: Receives a List of all players
+      security:
+        - account-key: []
+        - game-key: []
+  /stats:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Stats'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: get-stats
+      security:
+        - account-key: []
+        - game-key: []
+      description: Receive stats of each player in the round
 components:
   schemas:
     Ships:
@@ -117,7 +161,7 @@ components:
         - production
         - skin
     Owner:
-      title: Player
+      title: Owner
       type: object
       properties:
         id:
@@ -147,4 +191,46 @@ components:
       required:
         - tiles
         - size
-  securitySchemes: {}
+    Error:
+      title: Error
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        description:
+          type: string
+      required:
+        - id
+        - title
+        - description
+    Stats:
+      title: Stats
+      type: object
+      description: Stats for one player
+      properties:
+        player:
+          $ref: '#/components/schemas/Owner'
+        visibleShips:
+          type: integer
+          minimum: 0
+        planets:
+          type: integer
+          minimum: 0
+        you:
+          type: boolean
+      required:
+        - player
+        - visibleShips
+        - planets
+        - you
+  securitySchemes:
+    account-key:
+      type: apiKey
+      in: header
+      description: This is one of your accounts keys
+    game-key:
+      type: apiKey
+      in: header
+      description: This your access key to the your current game

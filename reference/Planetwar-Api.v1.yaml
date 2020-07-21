@@ -8,7 +8,13 @@ paths:
   /map:
     get:
       summary: Query whole map
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Map'
       operationId: get-map
       tags:
         - Gameinformation
@@ -102,3 +108,9 @@ components:
       required:
         - id
         - name
+    Map:
+      title: Map
+      type: array
+      description: A collection of tiles that make up the map
+      items:
+        $ref: '#/components/schemas/Tile'

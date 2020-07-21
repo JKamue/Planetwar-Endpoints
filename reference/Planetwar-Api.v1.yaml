@@ -63,7 +63,8 @@ paths:
   /round:
     get:
       summary: Query round information
-      tags: []
+      tags:
+        - Gameinformation
       responses:
         '200':
           description: OK
@@ -71,6 +72,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Round'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
       operationId: get-round
       description: Returns important data of current round
       security:
@@ -79,7 +86,8 @@ paths:
   '/events/{round}':
     get:
       summary: List battles
-      tags: []
+      tags:
+        - Gameinformation
       responses:
         '200':
           description: OK
@@ -87,6 +95,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Event'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
       operationId: get-events
       description: Receives a List with all battles
       security:
@@ -101,6 +115,59 @@ paths:
         in: path
         required: true
         description: specify the round for which events are shown
+  /move:
+    post:
+      summary: Move ships
+      operationId: post-move
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: Number of turns shipts will take till they arrive
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - Actions
+      description: |-
+        Move ships from one location of the other.
+        You need enough ships at the start location!
+        If you don't have any / enoughs ships at the start 400 will be returned
+      security:
+        - account-key: []
+        - game-key: []
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Start:
+                  $ref: '#/components/schemas/Location'
+                End:
+                  $ref: '#/components/schemas/Location'
+                Amount:
+                  type: integer
+                  exclusiveMinimum: false
+                  minimum: 1
+              required:
+                - Start
+                - End
+                - Amount
+        description: ''
 components:
   schemas:
     Ships:

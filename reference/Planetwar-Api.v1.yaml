@@ -17,24 +17,37 @@ components:
     Ships:
       title: Ships
       type: object
+      description: Collection of ships
       properties:
         location:
           $ref: '#/components/schemas/Location'
         amount:
           type: string
         owner:
-          type: string
+          $ref: '#/components/schemas/Owner'
+      required:
+        - location
+        - amount
+        - owner
     Location:
       title: Location
       type: object
       properties:
         X:
           type: integer
+          minimum: 0
+          description: X coordinate on map
         'Y':
           type: integer
+          minimum: 0
+          description: Y coordinate on map
+      required:
+        - X
+        - 'Y'
     Tile:
       title: Tile
       type: object
+      description: Stores the objects of one map tile
       properties:
         location:
           $ref: '#/components/schemas/Location'
@@ -42,19 +55,50 @@ components:
           $ref: '#/components/schemas/Ships'
         hasShips:
           type: boolean
+          description: Ships is only set if hasShips is true
         planet:
           $ref: '#/components/schemas/Planet'
         hasPlanet:
-          type: string
+          type: boolean
+          description: Planet is only set if hasPlanet is true
+      required:
+        - location
+        - hasShips
+        - hasPlanet
     Planet:
       title: Planet
       type: object
+      description: Stores planet information
       properties:
         location:
           $ref: '#/components/schemas/Location'
         owner:
-          type: string
+          $ref: '#/components/schemas/Owner'
         production:
           type: integer
+          minimum: 0
+          exclusiveMinimum: true
+          description: Production of ships per round
         skin:
           type: integer
+          minimum: 0
+          description: The planets skin
+      required:
+        - location
+        - owner
+        - production
+        - skin
+    Owner:
+      title: Owner
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The owner uuid
+        name:
+          type: string
+          description: Owner display name
+      required:
+        - id
+        - name

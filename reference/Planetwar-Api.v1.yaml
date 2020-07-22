@@ -6,10 +6,14 @@ info:
     name: Jannes Kaspar-Müller
     url: 'https://jkamue.de'
     email: mail@jkamue.de
+  description: ''
 servers:
-  - url: 'http://planetwar.jkamue.de/api'
-  - url: 'http://localhost:8080/api'
-    description: ''
+  - url: 'https://planetwar.jkamue.de/api'
+    description: ' Official game server'
+  - url: 'http://localhost:81/Planetwar-Backend/api'
+    description: ' My local developement server'
+  - description: ' Test Server'
+    url: 'https://dummy.planetwar.jkamue.de/api'
 paths:
   /map:
     get:
@@ -194,6 +198,103 @@ paths:
       security:
         - account-key: []
         - game-key: []
+  '/join/{visitor}':
+    post:
+      summary: Join a game
+      operationId: post-join
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                description: 'The game key, has to be set as header from now on'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: |-
+        Join a newly created game.
+        Returns 400 if game already started.
+      security:
+        - account-key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gameId:
+                  type: string
+                gameCode:
+                  type: string
+              required:
+                - gameId
+                - gameCode
+      tags:
+        - Actions
+    parameters:
+      - schema:
+          type: boolean
+        name: visitor
+        in: path
+        description: You can join as a visitor or player
+        required: true
+  /create:
+    post:
+      summary: Create game
+      operationId: post-create
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gameId:
+                    type: string
+                  gameCode:
+                    type: string
+                required:
+                  - gameId
+                  - gameCode
+      tags:
+        - Actions
+      description: |-
+        Creates a new game with given parameters and returns game ID and code for others to join.
+        Player doesnt join automatically and has to make a seperate request to join.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                size:
+                  type: integer
+                ships:
+                  type: integer
+                production:
+                  type: integer
+                players:
+                  type: integer
+                  minimum: 2
+              required:
+                - size
+                - ships
+                - production
+                - players
+      security:
+        - account-key: []
 components:
   schemas:
     Ships:
@@ -320,8 +421,6 @@ components:
       type: object
       description: Stats for one player
       properties:
-        player:
-          $ref: '#/components/schemas/Owner'
         visibleShips:
           type: integer
           minimum: 0
@@ -332,8 +431,9 @@ components:
           type: boolean
         alive:
           type: boolean
+        owner:
+          $ref: '#/components/schemas/Owner'
       required:
-        - player
         - visibleShips
         - planets
         - you
@@ -372,7 +472,7 @@ components:
           type: integer
         defenderShips:
           type: integer
-        attackerShipslost:
+        attackerShipsLost:
           type: integer
         defenderShipslost:
           type: integer

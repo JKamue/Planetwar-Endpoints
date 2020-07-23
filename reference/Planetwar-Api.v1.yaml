@@ -239,6 +239,9 @@ paths:
                   type: string
                 gameCode:
                   type: string
+              required:
+                - gameId
+                - gameCode
       security:
         - account-key: []
       description: Join a newly created game. Returns 400 if game already started.
@@ -290,7 +293,38 @@ paths:
                 - players
       security:
         - account-key: []
-  /login: {}
+  /login:
+    post:
+      summary: ''
+      operationId: post-login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                description: Account key that has to be set from now on
+        '401':
+          description: 'Unauthorized, when login failed, reason will be described in error message'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: Log into an existing account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
 components:
   schemas:
     Ships:

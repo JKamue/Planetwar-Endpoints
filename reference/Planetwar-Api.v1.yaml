@@ -10,7 +10,7 @@ info:
 servers:
   - url: 'https://planetwar.jkamue.de/api'
     description: ' Official game server'
-  - url: 'http://localhost:81/Planetwar-Backend/api'
+  - url: 'http://localhost:81/api'
     description: ' My local developement server'
   - description: ' Test Server'
     url: 'https://dummy.planetwar.jkamue.de/api'
@@ -199,9 +199,16 @@ paths:
         - account-key: []
         - game-key: []
   '/join/{visitor}':
+    parameters:
+      - schema:
+          type: boolean
+        name: visitor
+        in: path
+        description: You can join as a visitor or player
+        required: true
     post:
       summary: Join a game
-      operationId: post-join
+      operationId: post-join-visitor
       responses:
         '200':
           description: OK
@@ -209,7 +216,7 @@ paths:
             application/json:
               schema:
                 type: string
-                description: 'The game key, has to be set as header from now on'
+                description: The game key that has to be set from now on
         '400':
           description: Bad Request
           content:
@@ -222,11 +229,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      description: |-
-        Join a newly created game.
-        Returns 400 if game already started.
-      security:
-        - account-key: []
       requestBody:
         content:
           application/json:
@@ -237,18 +239,11 @@ paths:
                   type: string
                 gameCode:
                   type: string
-              required:
-                - gameId
-                - gameCode
+      security:
+        - account-key: []
+      description: Join a newly created game. Returns 400 if game already started.
       tags:
         - Actions
-    parameters:
-      - schema:
-          type: boolean
-        name: visitor
-        in: path
-        description: You can join as a visitor or player
-        required: true
   /create:
     post:
       summary: Create game
@@ -295,6 +290,7 @@ paths:
                 - players
       security:
         - account-key: []
+  /login: {}
 components:
   schemas:
     Ships:
@@ -491,17 +487,17 @@ components:
         sentAt:
           type: integer
           description: Round ships were sent at
-        ariveAt:
+        arriveAt:
           type: integer
           description: Round the ships will arrive at
-        Amount:
+        amount:
           type: integer
       required:
         - id
         - start
         - end
         - sentAt
-        - ariveAt
+        - arriveAt
   securitySchemes:
     account-key:
       type: apiKey

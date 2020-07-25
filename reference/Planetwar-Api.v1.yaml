@@ -10,7 +10,7 @@ info:
 servers:
   - url: 'https://planetwar.jkamue.de/api'
     description: ' Official game server'
-  - url: 'http://localhost:81/api'
+  - url: 'http://localhost:82/api'
     description: ' My local developement server'
   - description: ' Test Server'
     url: 'https://dummy.planetwar.jkamue.de/api'
@@ -129,8 +129,16 @@ paths:
           content:
             application/json:
               schema:
-                type: integer
+                type: object
                 description: Number of turns shipts will take till they arrive
+                properties:
+                  arrival:
+                    type: integer
+                  time:
+                    type: integer
+                required:
+                  - arrival
+                  - time
         '400':
           description: Bad Request
           content:
@@ -242,9 +250,10 @@ paths:
               required:
                 - gameId
                 - gameCode
+        description: GameCode only has to be set if not joining as visitor
       security:
         - account-key: []
-      description: Join a newly created game. Returns 400 if game already started.
+      description: Join a newly created game. Returns 400 if game already started and visitor is false
       tags:
         - Actions
   /create:
@@ -266,6 +275,18 @@ paths:
                 required:
                   - gameId
                   - gameCode
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
       tags:
         - Actions
       description: |-
@@ -277,20 +298,27 @@ paths:
             schema:
               type: object
               properties:
-                size:
-                  type: integer
                 ships:
                   type: integer
+                  minimum: 5
+                  maximum: 80
                 production:
                   type: integer
+                  minimum: 5
+                  maximum: 30
                 players:
                   type: integer
                   minimum: 2
+                  maximum: 8
+                size:
+                  type: integer
+                  minimum: 7
+                  maximum: 20
               required:
-                - size
                 - ships
                 - production
                 - players
+                - size
       security:
         - account-key: []
   /login:
@@ -325,6 +353,34 @@ paths:
               required:
                 - username
                 - password
+      tags:
+        - Actions
+  /update:
+    post:
+      summary: ''
+      operationId: post-update
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '400':
+          description: Bad Request - if game-id header not present or wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      tags:
+        - System
+      description: Should be called every few seconds since the php backend has a hard time calling it itself. Requires no authorization
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: game-id
+          required: true
 components:
   schemas:
     Ships:

@@ -12,8 +12,6 @@ servers:
     description: ' Official game server'
   - url: 'http://localhost:82/api'
     description: ' My local developement server'
-  - description: ' Test Server'
-    url: 'https://dummy.planetwar.jkamue.de/api'
 paths:
   /map:
     get:
@@ -36,8 +34,8 @@ paths:
         - Gameinformation
       description: Receive a detailed list of everything on the map
       security:
-        - account-key: []
-        - game-key: []
+        - Account-Key: []
+        - Game-Key: []
       parameters: []
   /stats:
     get:
@@ -61,8 +59,8 @@ paths:
                 $ref: '#/components/schemas/Error'
       operationId: get-stats
       security:
-        - account-key: []
-        - game-key: []
+        - Account-Key: []
+        - Game-Key: []
       description: Receive stats of each player in the round
   /round:
     get:
@@ -85,9 +83,9 @@ paths:
       operationId: get-round
       description: Returns important data of current round
       security:
-        - account-key: []
-        - game-key: []
-  '/events/{round}':
+        - Account-Key: []
+        - Game-Key: []
+  /events:
     get:
       summary: Query events
       tags:
@@ -108,17 +106,9 @@ paths:
       operationId: get-events
       description: Receives a List with all battles
       security:
-        - account-key: []
-        - game-key: []
-    parameters:
-      - schema:
-          type: integer
-          minimum: 0
-          exclusiveMinimum: true
-        name: round
-        in: path
-        required: true
-        description: specify the round for which events are shown
+        - Account-Key: []
+        - Game-Key: []
+    parameters: []
   /move:
     post:
       summary: Move ships
@@ -158,8 +148,8 @@ paths:
         You need enough ships at the start location!
         If you don't have any / enoughs ships at the start 400 will be returned
       security:
-        - account-key: []
-        - game-key: []
+        - Account-Key: []
+        - Game-Key: []
       parameters: []
       requestBody:
         content:
@@ -204,8 +194,8 @@ paths:
       operationId: get-sent
       description: Receives a list of your sent ships
       security:
-        - account-key: []
-        - game-key: []
+        - Account-Key: []
+        - Game-Key: []
   '/join/{visitor}':
     parameters:
       - schema:
@@ -221,7 +211,7 @@ paths:
         '200':
           description: OK
           content:
-            application/json:
+            text/plain:
               schema:
                 type: string
                 description: The game key that has to be set from now on
@@ -252,7 +242,7 @@ paths:
                 - gameCode
         description: GameCode only has to be set if not joining as visitor
       security:
-        - account-key: []
+        - Account-Key: []
       description: Join a newly created game. Returns 400 if game already started and visitor is false
       tags:
         - Actions
@@ -320,7 +310,7 @@ paths:
                 - players
                 - size
       security:
-        - account-key: []
+        - Account-Key: []
   /login:
     post:
       summary: ''
@@ -329,7 +319,7 @@ paths:
         '200':
           description: OK
           content:
-            application/json:
+            text/plain:
               schema:
                 type: string
                 description: Account key that has to be set from now on
@@ -363,7 +353,7 @@ paths:
         '200':
           description: OK
           content:
-            application/json:
+            text/plain:
               schema:
                 type: boolean
         '400':
@@ -379,25 +369,10 @@ paths:
         - schema:
             type: string
           in: header
-          name: game-id
+          name: Game-Id
           required: true
 components:
   schemas:
-    Ships:
-      title: Ships
-      type: object
-      description: Collection of ships
-      properties:
-        location:
-          $ref: '#/components/schemas/Location'
-        amount:
-          type: string
-        owner:
-          $ref: '#/components/schemas/Owner'
-      required:
-        - location
-        - amount
-        - owner
     Location:
       title: Location
       type: object
@@ -421,28 +396,26 @@ components:
         location:
           $ref: '#/components/schemas/Location'
         ships:
-          $ref: '#/components/schemas/Ships'
-        hasShips:
-          type: boolean
-          description: Ships is only set if hasShips is true
+          type: integer
         planet:
           $ref: '#/components/schemas/Planet'
         hasPlanet:
           type: boolean
           description: Planet is only set if hasPlanet is true
+        owner:
+          $ref: '#/components/schemas/Owner'
+        hidden:
+          type: boolean
+          description: 'If hidden is true owner, planet and ships will not be set'
       required:
         - location
-        - hasShips
         - hasPlanet
+        - hidden
     Planet:
       title: Planet
       type: object
       description: Stores planet information
       properties:
-        location:
-          $ref: '#/components/schemas/Location'
-        owner:
-          $ref: '#/components/schemas/Owner'
         production:
           type: integer
           minimum: 0
@@ -453,8 +426,6 @@ components:
           minimum: 0
           description: The planets skin
       required:
-        - location
-        - owner
         - production
         - skin
     Owner:
@@ -513,17 +484,11 @@ components:
         planets:
           type: integer
           minimum: 0
-        you:
-          type: boolean
-        alive:
-          type: boolean
         owner:
           $ref: '#/components/schemas/Owner'
       required:
         - visibleShips
         - planets
-        - you
-        - alive
     Round:
       title: Round
       type: object
@@ -589,12 +554,12 @@ components:
         - sentAt
         - arriveAt
   securitySchemes:
-    account-key:
+    Account-Key:
       type: apiKey
       in: header
       description: This is one of your accounts keys
       name: Account-Key
-    game-key:
+    Game-Key:
       type: apiKey
       in: header
       description: This your access key to the your current game

@@ -309,6 +309,7 @@ paths:
                 - production
                 - players
                 - size
+        description: ''
       security:
         - Account-Key: []
   /login:
@@ -486,6 +487,8 @@ components:
           minimum: 0
         owner:
           $ref: '#/components/schemas/Owner'
+        production:
+          type: integer
       required:
         - visibleShips
         - planets

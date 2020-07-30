@@ -503,10 +503,16 @@ components:
           description: 'Vermutlich unix epoch oder YYYY-MM-DD H:i:s'
         length:
           type: integer
+        specator:
+          type: boolean
+        id:
+          type: string
       required:
         - number
         - start
         - length
+        - specator
+        - id
     Event:
       title: Event
       type: object

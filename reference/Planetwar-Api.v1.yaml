@@ -505,14 +505,18 @@ components:
           type: integer
         specator:
           type: boolean
-        id:
+        playerId:
+          type: string
+        creatorId:
+          type: string
+        gameId:
           type: string
       required:
         - number
         - start
         - length
         - specator
-        - id
+        - playerId
     Event:
       title: Event
       type: object
